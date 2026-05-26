@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Session Posters</title>
+  <title>Poster Session</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -91,23 +91,23 @@
 
 <div id="sending-overlay">
   <div class="sending-spinner"></div>
-  <div class="sending-text">Envoi en cours…</div>
+  <div class="sending-text">Sending…</div>
 </div>
 
 <header>
-  <div class="logo-chip"><span></span> Évaluation Posters</div>
-  <h1>Vos <em>4 posters</em><br>à évaluer</h1>
-  <p class="subtitle">Cliquez une note, enregistrez, puis soumettez !</p>
+  <div class="logo-chip"><span></span> Poster Evaluation</div>
+  <h1>Your <em>posters</em><br>to evaluate</h1>
+  <p class="subtitle">Click a rating, save it, then submit!</p>
 </header>
 
 <div id="state-screen">
   <div class="spinner"></div>
-  <p style="color:var(--muted);font-size:14px;">Chargement en cours…</p>
+  <p style="color:var(--muted);font-size:14px;">Loading…</p>
 </div>
 
 <div id="main">
   <div class="already-banner" id="already-banner">
-    ✅ Vous avez déjà soumis vos évaluations. Merci pour votre participation !
+    ✅ You have already submitted your evaluations. Thank you for your participation!
   </div>
   <div class="participant-card">
     <div class="avatar" id="avatar">?</div>
@@ -116,19 +116,19 @@
       <span class="topic-badge" id="topic-badge">Topic —</span>
     </div>
   </div>
-  <p class="section-label">Progression — <span id="rated-count">0</span>/<span id="total-count">?</span> notés</p>
+  <p class="section-label">Progress — <span id="rated-count">0</span>/<span id="total-count">?</span> rated</p>
   <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-bar" style="width:0%"></div></div>
-  <p class="section-label">Vos posters assignés</p>
+  <p class="section-label">Your assigned posters</p>
   <div id="posters-list"></div>
   <div id="submit-section">
-    <div class="submit-title">Tout noté ? 🎉</div>
-    <p class="submit-sub">Tous vos posters sont enregistrés.<br>Cliquez pour envoyer vos évaluations.</p>
-    <button class="submit-main-btn" id="submit-btn" disabled onclick="submitAll()">Soumettre mes évaluations</button>
+    <div class="submit-title">All rated? 🎉</div>
+    <p class="submit-sub">All your posters are saved.<br>Click to send your evaluations.</p>
+    <button class="submit-main-btn" id="submit-btn" disabled onclick="submitAll()">Submit my evaluations</button>
   </div>
   <div id="done-screen">
     <div class="done-icon">✅</div>
-    <div class="done-title">Merci !</div>
-    <p class="done-sub">Vos évaluations ont bien été<br>enregistrées. Bonne conférence !</p>
+    <div class="done-title">Thank you!</div>
+    <p class="done-sub">Your evaluations have been<br>successfully recorded. Enjoy the conference!</p>
   </div>
 </div>
 
@@ -136,7 +136,7 @@
 // ══════════════════════════════════════════════
 // ⚙️  CONFIGURATION
 // ══════════════════════════════════════════════
-const API_URL  = "https://web-production-e1566.up.railway.app/";
+const API_URL  = "https://web-production-c2363.up.railway.app";
 const DATA_URL = "assignments.json";
 // ══════════════════════════════════════════════
 
@@ -155,7 +155,7 @@ const PARTICIPANT_ID = new URLSearchParams(window.location.search).get("id");
 
 async function init() {
   if (!PARTICIPANT_ID) {
-    showError("Identifiant manquant", "Scannez votre QR code personnel.");
+    showError("Missing identifier", "Please scan your personal QR code.");
     return;
   }
 
@@ -165,14 +165,14 @@ async function init() {
     if (!res.ok) throw new Error();
     data = await res.json();
   } catch {
-    showError("Fichier introuvable", "Impossible de charger assignments.json.");
+    showError("File not found", "Unable to load assignments.json.");
     return;
   }
 
   // Trouver le participant — les IDs sont des strings
   participant = data.participants[String(PARTICIPANT_ID)];
   if (!participant) {
-    showError("Participant inconnu", `ID "${PARTICIPANT_ID}" introuvable.`);
+    showError("Unknown participant", `ID "${PARTICIPANT_ID}" introuvable.`);
     return;
   }
 
@@ -244,13 +244,13 @@ function renderPosters() {
           <div class="poster-title">${poster.title}</div>
           <div class="poster-meta">
             <span>Poster #${posterId}</span><span>·</span><span>Topic ${poster.topic}</span>
-            ${isOut ? '<span class="out-badge">Hors votre topic</span>' : ''}
+            ${isOut ? '<span class="out-badge">Outside your topic</span>' : ''}
             ${poster.presenter ? `<span>· ${poster.presenter}</span>` : ''}
           </div>
         </div>
       </div>
       <div class="rating-area">
-        <div class="rating-label">Choisissez une note de 1 à 5, puis cliquez Enregistrer</div>
+        <div class="rating-label">Choose a rating from 1 to 5, then click Save</div>
         <div class="stars" id="stars-${posterId}">
           ${[1,2,3,4,5].map(n => `
             <button class="star-btn ${cur.score >= n ? 'active' : ''}"
@@ -258,13 +258,13 @@ function renderPosters() {
           `).join("")}
         </div>
         <textarea class="comment-input" id="comment-${posterId}"
-          placeholder="Commentaire libre (optionnel)…"
+          placeholder="Free comment (optional)…"
           oninput="saveComment('${posterId}', this.value)">${cur.comment || ""}</textarea>
         <button class="save-btn ${scored ? 'saved' : ''}" id="save-${posterId}"
           onclick="saveRating('${posterId}')" ${scored ? '' : 'disabled'}>
-          ${scored ? '✓ Note enregistrée' : 'Enregistrer la note'}
+          ${scored ? '✓ Rating saved' : 'Save rating'}
         </button>
-        ${!scored ? '<p class="hint">👆 Cliquez un chiffre ci-dessus pour activer ce bouton</p>' : ''}
+        ${!scored ? '<p class="hint">👆 Click a number above to enable this button</p>' : ''}
       </div>`;
     list.appendChild(card);
   });
@@ -284,7 +284,7 @@ function setRating(posterId, score) {
   const saveBtn = document.getElementById("save-" + posterId);
   if (saveBtn) {
     saveBtn.disabled = false;
-    saveBtn.textContent = "Enregistrer la note";
+    saveBtn.textContent = "Save rating";
     saveBtn.classList.remove("saved");
   }
 
@@ -301,7 +301,7 @@ function saveComment(posterId, val) {
   ratings[posterId].comment = val;
 }
 
-// Appelé quand on clique "Enregistrer la note"
+// Appelé quand on clique "Save rating"
 function saveRating(posterId) {
   posterId = String(posterId);
   if (!ratings[posterId] || !ratings[posterId].score) return;
@@ -313,7 +313,7 @@ function saveRating(posterId) {
   document.getElementById("card-" + posterId)?.classList.add("rated");
   const btn = document.getElementById("save-" + posterId);
   if (btn) {
-    btn.textContent = "✓ Note enregistrée";
+    btn.textContent = "✓ Rating saved";
     btn.disabled = true;
     btn.classList.add("saved");
   }
@@ -369,8 +369,8 @@ async function submitAll() {
     console.error(err);
     document.getElementById("sending-overlay").classList.remove("active");
     btn.disabled = false;
-    btn.textContent = "⚠ Réessayer — Soumettre mes évaluations";
-    alert("❌ Erreur lors de l'envoi. Vérifiez votre connexion et réessayez.");
+    btn.textContent = "⚠ Réessayer — Submit my evaluations";
+    alert("❌ Sending failed. Please check your connection and try again.");
   }
 }
 
